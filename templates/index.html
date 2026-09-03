@@ -1,1 +1,352 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nora</title>
 
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #11131a;
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game {
+            width: 95%;
+            max-width: 900px;
+            height: 90vh;
+            background: #1b1e27;
+            border-radius: 18px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: #242835;
+            border-bottom: 1px solid #343947;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            color: #aeb4c2;
+        }
+
+        .stats {
+            padding: 15px 20px;
+            background: #20232d;
+        }
+
+        .stat {
+            margin-bottom: 8px;
+        }
+
+        .stat:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-name {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: #d9dce5;
+        }
+
+        .bar {
+            width: 100%;
+            height: 9px;
+            background: #0f1116;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .fill {
+            height: 100%;
+            width: 50%;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        .love {
+            background: #ff5c8a;
+        }
+
+        .friendship {
+            background: #5c9cff;
+        }
+
+        .trust {
+            background: #8c6cff;
+        }
+
+        .mood {
+            background: #ffd45c;
+        }
+
+        .chat {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            max-width: 75%;
+            padding: 12px 15px;
+            border-radius: 14px;
+            line-height: 1.5;
+        }
+
+        .nora {
+            background: #292d39;
+            margin-right: auto;
+        }
+
+        .player {
+            background: #3b4d70;
+            margin-left: auto;
+        }
+
+        .name {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #b8bfd0;
+        }
+
+        .input-area {
+            display: flex;
+            padding: 15px;
+            gap: 10px;
+            background: #20232d;
+            border-top: 1px solid #343947;
+        }
+
+        input {
+            flex: 1;
+            padding: 13px;
+            border: none;
+            outline: none;
+            border-radius: 10px;
+            background: #11131a;
+            color: white;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 13px 20px;
+            border: none;
+            border-radius: 10px;
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #7b8df0;
+        }
+
+        .reset {
+            background: #3a3e49;
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .reset:hover {
+            background: #505563;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="game">
+
+    <div class="header">
+        <h1>Nora</h1>
+        <p>Someone just knocked on her door...</p>
+    </div>
+
+    <div class="stats">
+
+        <div class="stat">
+            <div class="stat-name">
+                <span>❤️ Affection</span>
+                <span id="loveValue">10%</span>
+            </div>
+            <div class="bar">
+                <div id="loveBar" class="fill love" style="width: 10%;"></div>
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-name">
+                <span>🤝 Friendship</span>
+                <span id="friendshipValue">10%</span>
+            </div>
+            <div class="bar">
+                <div id="friendshipBar" class="fill friendship" style="width: 10%;"></div>
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-name">
+                <span>🔐 Trust</span>
+                <span id="trustValue">10%</span>
+            </div>
+            <div class="bar">
+                <div id="trustBar" class="fill trust" style="width: 10%;"></div>
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-name">
+                <span>😊 Mood</span>
+                <span id="moodValue">50%</span>
+            </div>
+            <div class="bar">
+                <div id="moodBar" class="fill mood" style="width: 50%;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="chat" id="chat">
+
+        <div class="message nora">
+            <div class="name">Nora</div>
+            Hey... I wasn't expecting anyone to come by.
+        </div>
+
+    </div>
+
+    <div class="input-area">
+        <input
+            id="messageInput"
+            type="text"
+            placeholder="Say something to Nora..."
+            autocomplete="off"
+        >
+
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <button class="reset" onclick="resetChat()">Reset</button>
+
+</div>
+
+<script>
+
+async function sendMessage() {
+
+    const input = document.getElementById("messageInput");
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    addMessage("You", message, "player");
+
+    input.value = "";
+
+    try {
+
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: message
+            })
+        });
+
+        const data = await response.json();
+
+        addMessage("Nora", data.response, "nora");
+
+    } catch (error) {
+
+        addMessage(
+            "Nora",
+            "Sorry... something went wrong.",
+            "nora"
+        );
+
+        console.error(error);
+    }
+}
+
+
+function addMessage(name, text, type) {
+
+    const chat = document.getElementById("chat");
+
+    const message = document.createElement("div");
+    message.className = "message " + type;
+
+    message.innerHTML = `
+        <div class="name">${name}</div>
+        ${text}
+    `;
+
+    chat.appendChild(message);
+
+    chat.scrollTop = chat.scrollHeight;
+}
+
+
+function resetChat() {
+
+    document.getElementById("chat").innerHTML = `
+        <div class="message nora">
+            <div class="name">Nora</div>
+            Hey... I wasn't expecting anyone to come by.
+        </div>
+    `;
+
+    document.getElementById("loveBar").style.width = "10%";
+    document.getElementById("friendshipBar").style.width = "10%";
+    document.getElementById("trustBar").style.width = "10%";
+    document.getElementById("moodBar").style.width = "50%";
+
+    document.getElementById("loveValue").textContent = "10%";
+    document.getElementById("friendshipValue").textContent = "10%";
+    document.getElementById("trustValue").textContent = "10%";
+    document.getElementById("moodValue").textContent = "50%";
+}
+
+
+document.getElementById("messageInput").addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+        sendMessage();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
+```
